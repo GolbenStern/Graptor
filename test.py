@@ -1,7 +1,7 @@
 #test runs to play with the board
 
-    import RPi.GPIO as GPIO
-import tkinter as tk
+import RPi.GPIO as GPIO
+import Tkinter as tk
 
 servo_pin = 18
 GPIO.setmode(GPIO.BCM)
