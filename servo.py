@@ -1,4 +1,6 @@
 #This code will run a servo motor on pin 17
+#This is a test code for the project, no intended for real use for the robotic hand
+
 
 import RPi.GPIO as GPIO
 import time
