@@ -1,30 +1,29 @@
 import RPi.GPIO as GPIO
 import time
 
-# Set up GPIO
+servo_pin = 18
 GPIO.setmode(GPIO.BCM)
-GPIO.setup(18, GPIO.OUT)
+GPIO.setup(servo_pin, GPIO.OUT)
 
-# Set up PWM
-pwm = GPIO.PWM(18, 50)  # 50 Hz frequency
-pwm.start(7.5)  # Start with 90 degrees position
+servo = GPIO.PWM(servo_pin, 50)
+servo.start(0)
 
 try:
     while True:
-        # Check user input and move servo accordingly
-        if input() == 'q':
-            pwm.ChangeDutyCycle(2.5)  # 0 degrees
-        elif input() == 'e':
-            pwm.ChangeDutyCycle(12.5)  # 180 degrees
-        else:
-            pwm.ChangeDutyCycle(7.5)  # 90 degrees
+        # Check for input from the terminal without waiting for an enter key
+        input_char = None
+        while input_char not in ['q', 'e', '']:
+            input_char = input()
         
-        # Wait for a short time before checking input again
-        time.sleep(0.1)
+        # Set the servo position based on the input
+        if input_char == 'q':
+            servo.ChangeDutyCycle(7.5) # turn clockwise to 90 degrees
+        elif input_char == 'e':
+            servo.ChangeDutyCycle(2.5) # turn counterclockwise to 0 degrees
+        else:
+            servo.ChangeDutyCycle(5) # stop moving
         
 except KeyboardInterrupt:
-    pass
+    servo.stop()
+    GPIO.cleanup()
 
-# Clean up GPIO
-pwm.stop()
-GPIO.cleanup()
