@@ -1,81 +1,66 @@
 #test code top run 2 servos from keyboard inputs
 
 import RPi.GPIO as GPIO
-import time
-import Tkinter as tk
+import tkinter as tk
+
+servo_pin1 = 18
+servo_pin2 = 17
 
 GPIO.setmode(GPIO.BCM)
+GPIO.setup(servo_pin1, GPIO.OUT)
+GPIO.setup(servo_pin2, GPIO.OUT)
 
-# define servo pins
-servo1_pin = 18
-servo2_pin = 17
+servo1 = GPIO.PWM(servo_pin1, 50)
+servo2 = GPIO.PWM(servo_pin2, 50)
 
-# setup servo pins as output
-GPIO.setup(servo1_pin, GPIO.OUT)
-GPIO.setup(servo2_pin, GPIO.OUT)
-
-# create servo objects
-servo1 = GPIO.PWM(servo1_pin, 50)
-servo2 = GPIO.PWM(servo2_pin, 50)
-
-# start servos at 0 position
 servo1.start(0)
 servo2.start(0)
 
-# create GUI window
+class App:
+    def __init__(self, master):
+        self.master = master
+        master.title("Servo Control")
+
+        self.clockwise_button1 = tk.Button(master, text="Clockwise 1", bg="green", command=self.run_clockwise1)
+        self.clockwise_button1.pack(side=tk.LEFT)
+
+        self.counterclockwise_button1 = tk.Button(master, text="Counterclockwise 1", bg="red", command=self.run_counterclockwise1)
+        self.counterclockwise_button1.pack(side=tk.LEFT)
+
+        self.stop_button1 = tk.Button(master, text="Stop 1", bg="yellow", command=self.run_stop1)
+        self.stop_button1.pack(side=tk.LEFT)
+
+        self.clockwise_button2 = tk.Button(master, text="Clockwise 2", bg="green", command=self.run_clockwise2)
+        self.clockwise_button2.pack(side=tk.LEFT)
+
+        self.counterclockwise_button2 = tk.Button(master, text="Counterclockwise 2", bg="red", command=self.run_counterclockwise2)
+        self.counterclockwise_button2.pack(side=tk.LEFT)
+
+        self.stop_button2 = tk.Button(master, text="Stop 2", bg="yellow", command=self.run_stop2)
+        self.stop_button2.pack(side=tk.LEFT)
+
+    def run_clockwise1(self):
+        servo1.ChangeDutyCycle(7.5)
+
+    def run_counterclockwise1(self):
+        servo1.ChangeDutyCycle(2.5)
+
+    def run_stop1(self):
+        servo1.ChangeDutyCycle(5)
+
+    def run_clockwise2(self):
+        servo2.ChangeDutyCycle(7.5)
+
+    def run_counterclockwise2(self):
+        servo2.ChangeDutyCycle(2.5)
+
+    def run_stop2(self):
+        servo2.ChangeDutyCycle(5)
+
 root = tk.Tk()
-root.title("Servo Control")
+app = App(root)
+root.mainloop()
 
-# function to run servo1 clockwise
-def run_servo1_cw():
-    servo1.ChangeDutyCycle(7.5) # turn to 90 degrees
-    time.sleep(1)
-    servo1.ChangeDutyCycle(12.5) # turn to 180 degrees
-    time.sleep(1)
-    servo1.ChangeDutyCycle(2.5) # turn to 0 degrees
-    time.sleep(1)
-
-# function to run servo1 counter-clockwise
-def run_servo1_ccw():
-    servo1.ChangeDutyCycle(12.5) # turn to 180 degrees
-    time.sleep(1)
-    servo1.ChangeDutyCycle(7.5) # turn to 90 degrees
-    time.sleep(1)
-    servo1.ChangeDutyCycle(2.5) # turn to 0 degrees
-    time.sleep(1)
-
-# function to stop servo1
-def stop_servo1():
-    servo1.ChangeDutyCycle(0)
-
-# function to run servo2 clockwise
-def run_servo2_cw():
-    servo2.ChangeDutyCycle(7.5) # turn to 90 degrees
-    time.sleep(1)
-    servo2.ChangeDutyCycle(12.5) # turn to 180 degrees
-    time.sleep(1)
-    servo2.ChangeDutyCycle(2.5) # turn to 0 degrees
-    time.sleep(1)
-
-# function to run servo2 counter-clockwise
-def run_servo2_ccw():
-    servo2.ChangeDutyCycle(12.5) # turn to 180 degrees
-    time.sleep(1)
-    servo2.ChangeDutyCycle(7.5) # turn to 90 degrees
-    time.sleep(1)
-    servo2.ChangeDutyCycle(2.5) # turn to 0 degrees
-    time.sleep(1)
-
-# function to stop servo2
-def stop_servo2():
-    servo2.ChangeDutyCycle(0)
-
-# create GUI buttons
-btn_servo1_cw = tk.Button(root, text="Servo1 CW", bg="green", command=run_servo1_cw)
-btn_servo1_ccw = tk.Button(root, text="Servo1 CCW", bg="red", command=run_servo1_ccw)
-btn_servo1_stop = tk.Button(root, text="Servo1 Stop", bg="gray", command=stop_servo1)
-btn_servo2_cw = tk.Button(root, text="Servo2 CW", bg="green", command=run_servo2_cw)
-btn_servo2_ccw = tk.Button(root, text="Servo2 CCW", bg="red", command=run_servo2_ccw)
-btn_servo2_stop = tk.Button(root, text="Servo2 Stop", bg="gray", command=stop_servo2)
-
-#
+servo1.stop()
+servo2.stop()
+GPIO.cleanup()
