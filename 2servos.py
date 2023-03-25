@@ -2,7 +2,7 @@
 
 import RPi.GPIO as GPIO
 import time
-import tkinter as tk
+import Tkinter as tk
 
 GPIO.setmode(GPIO.BCM)
 
