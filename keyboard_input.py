@@ -1,5 +1,5 @@
 #this code is for inputting the output for gpio pin 18 to control the solenoid as a test
-#this code is not for final use
+#this code is not for final user
 
 import RPi.GPIO as GPIO
 
