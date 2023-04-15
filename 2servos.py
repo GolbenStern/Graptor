@@ -1,7 +1,7 @@
 #test code top run 2 servos from keyboard inputs
 
 import RPi.GPIO as GPIO
-import tkinter as tk
+import Tkinter as tk
 
 servo_pin1 = 18
 servo_pin2 = 17
