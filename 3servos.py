@@ -1,9 +1,9 @@
 import RPi.GPIO as GPIO
 import Tkinter as tk
 
-servo_pin1 = 18
-servo_pin2 = 17
-servo_pin3 = 16
+servo_pin1 = 2
+servo_pin2 = 3
+servo_pin3 = 4
 
 GPIO.setmode(GPIO.BCM)
 GPIO.setup(servo_pin1, GPIO.OUT)

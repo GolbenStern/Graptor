@@ -1,76 +1,63 @@
-import Tkinter as tk
 import RPi.GPIO as GPIO
-import time
+import tkinter as tk
 
-# Set up GPIO
-GPIO.setmode(GPIO.BCM)
-servo_pins = [2, 3, 4]
+servo_pin1 = 2
+servo_pin2 = 3
+servo_pin3 = 4
 solenoid_pins = [5, 6, 7, 8, 9, 10, 11, 12]
 
-for pin in servo_pins:
-    GPIO.setup(pin, GPIO.OUT)
+GPIO.setmode(GPIO.BCM)
+GPIO.setup(servo_pin1, GPIO.OUT)
+GPIO.setup(servo_pin2, GPIO.OUT)
+GPIO.setup(servo_pin3, GPIO.OUT)
 for pin in solenoid_pins:
     GPIO.setup(pin, GPIO.OUT)
 
-# Define servo angles and solenoid labels
-servo_angles = {"thumb": 0, "index": 0, "ring": 0}
-solenoid_labels = ["1a", "1b", "2a", "2b", "3a", "3b", "4a", "4b"]
+servo1 = GPIO.PWM(servo_pin1, 50)
+servo2 = GPIO.PWM(servo_pin2, 50)
+servo3 = GPIO.PWM(servo_pin3, 50)
 
-# Define functions for servo and solenoid control
-def set_servo_angle(servo, angle):
-    duty = angle / 18 + 2
-    GPIO.output(servo_pins[servo], True)
-    pwm = GPIO.PWM(servo_pins[servo], 50)
-    pwm.start(0)
-    pwm.ChangeDutyCycle(duty)
-    time.sleep(0.5)
-    pwm.stop()
-    GPIO.output(servo_pins[servo], False)
+servo1.start(0)
+servo2.start(0)
+servo3.start(0)
 
-def set_solenoid_state(solenoid, state):
-    GPIO.output(solenoid_pins[solenoid], state)
+class App:
+    def __init__(self, master):
+        self.master = master
+        master.title("Servo and Solenoid Control")
 
-# Define functions for GUI control
-def update_servo_angle(servo):
-    angle = servo_angles[servo]
-    set_servo_angle(servo_pins.index(servo), angle)
-    print(f"{servo} angle set to {angle}")
+        self.slider1 = tk.Scale(master, from_=6.5, to=2.5, resolution=0.1, label="Thumb Servo", command=self.run_servo1)
+        self.slider1.pack()
 
-def update_solenoid_state(solenoid):
-    state = solenoid_states[solenoid]
-    set_solenoid_state(solenoid_labels.index(solenoid), state)
-    print(f"{solenoid} state set to {state}")
+        self.slider2 = tk.Scale(master, from_=6.5, to=2.5, resolution=0.1, label="Ring Servo", command=self.run_servo2)
+        self.slider2.pack()
 
-# Create GUI
+        self.slider3 = tk.Scale(master, from_=12.5, to=7.5, resolution=0.1, label="Index Servo", command=self.run_servo3)
+        self.slider3.pack()
+
+        self.buttons = []
+        for i in range(8):
+            button = tk.Button(master, text="Solenoid {}".format(i+1), bg="white", command=lambda pin=solenoid_pins[i]: self.toggle_solenoid(pin))
+            button.pack()
+            self.buttons.append(button)
+
+    def run_servo1(self, duty_cycle):
+        servo1.ChangeDutyCycle(float(duty_cycle))
+
+    def run_servo2(self, duty_cycle):
+        servo2.ChangeDutyCycle(float(duty_cycle))
+
+    def run_servo3(self, duty_cycle):
+        servo3.ChangeDutyCycle(float(duty_cycle))
+
+    def toggle_solenoid(self, pin):
+        GPIO.output(pin, not GPIO.input(pin))
+
 root = tk.Tk()
-root.title("Robotic Hand Control")
-
-# Create servo angle labels
-tk.Label(root, text="Thumb").grid(row=0, column=0)
-tk.Label(root, text="Index").grid(row=1, column=0)
-tk.Label(root, text="Ring").grid(row=2, column=0)
-
-# Create servo angle sliders
-thumb_slider = tk.Scale(root, from_=0, to=180, orient=tk.HORIZONTAL, command=lambda x: servo_angles.update({"thumb": int(x)}))
-thumb_slider.set(servo_angles["thumb"])
-thumb_slider.grid(row=0, column=1)
-
-index_slider = tk.Scale(root, from_=0, to=180, orient=tk.HORIZONTAL, command=lambda x: servo_angles.update({"index": int(x)}))
-index_slider.set(servo_angles["index"])
-index_slider.grid(row=1, column=1)
-
-ring_slider = tk.Scale(root, from_=0, to=180, orient=tk.HORIZONTAL, command=lambda x: servo_angles.update({"ring": int(x)}))
-ring_slider.set(servo_angles["ring"])
-ring_slider.grid(row=2, column=1)
-
-# Create solenoid buttons
-solenoid_states = {solenoid: False for solenoid in solenoid_labels}
-
-for i, solenoid in enumerate(solenoid_labels):
-    tk.Button(root, text=solenoid, command=lambda s=solenoid: solenoid_states.update({s: not solenoid_states[s]})).grid(row=3, column=i+1)
-
-# Start main loop
+app = App(root)
 root.mainloop()
 
-# Clean up GPIO
+servo1.stop()
+servo2.stop()
+servo3.stop()
 GPIO.cleanup()
