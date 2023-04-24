@@ -37,7 +37,7 @@ class App:
 
         self.buttons = []
         for i in range(8):
-            button = tk.Button(master, text="Solenoid {}".format(i+1), bg="white", command=lambda pin=solenoid_pins[i]: self.toggle_solenoid(pin))
+            button = tk.Button(master, text="Solenoid {}".format(i+1), bg="white", fg="black", command=lambda pin=solenoid_pins[i]: self.toggle_solenoid(pin))
             button.pack()
             self.buttons.append(button)
 
