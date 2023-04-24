@@ -12,6 +12,7 @@ GPIO.setup(servo_pin2, GPIO.OUT)
 GPIO.setup(servo_pin3, GPIO.OUT)
 for pin in solenoid_pins:
     GPIO.setup(pin, GPIO.OUT)
+    GPIO.output(pin, GPIO.LOW)  # set initial state to low
 
 servo1 = GPIO.PWM(servo_pin1, 50)
 servo2 = GPIO.PWM(servo_pin2, 50)
