@@ -1,55 +1,73 @@
-#this code does a test for the solenoid
-
 import RPi.GPIO as GPIO
-import tkinter as tk
+import Tkinter as tk
+import rospy
 
-# Set up servo on GPIO pin 18
-servo_pin = 18
-GPIO.setmode(GPIO.BCM)
-GPIO.setup(servo_pin, GPIO.OUT)
-servo = GPIO.PWM(servo_pin, 50)
-servo.start(0)
+servo_pin1 = 2
+servo_pin2 = 3
+servo_pin3 = 4
+solenoid_pins = [5, 6, 7, 8, 9, 10, 11, 12]
 
-# Set up solenoid on GPIO pin 16
-solenoid_pin = 16
 GPIO.setmode(GPIO.BCM)
-GPIO.setup(solenoid_pin, GPIO.OUT)
+GPIO.setup(servo_pin1, GPIO.OUT)
+GPIO.setup(servo_pin2, GPIO.OUT)
+GPIO.setup(servo_pin3, GPIO.OUT)
+for pin in solenoid_pins:
+    GPIO.setup(pin, GPIO.OUT)
+
+servo1 = GPIO.PWM(servo_pin1, 50)
+servo2 = GPIO.PWM(servo_pin2, 50)
+servo3 = GPIO.PWM(servo_pin3, 50)
+
+servo1.start(0)
+servo2.start(0)
+servo3.start(0)
 
 class App:
     def __init__(self, master):
         self.master = master
         master.title("Servo and Solenoid Control")
 
-        self.clockwise_button = tk.Button(master, text="Clockwise", bg="green", command=self.run_clockwise)
-        self.clockwise_button.pack(side=tk.LEFT)
+        self.slider1 = tk.Scale(master, from_=6.5, to=2.5, resolution=0.1, label="Thumb Servo", command=self.run_servo1)
+        self.slider1.pack()
 
-        self.counterclockwise_button = tk.Button(master, text="Counterclockwise", bg="red", command=self.run_counterclockwise)
-        self.counterclockwise_button.pack(side=tk.LEFT)
+        self.slider2 = tk.Scale(master, from_=6.5, to=2.5, resolution=0.1, label="Ring Servo", command=self.run_servo2)
+        self.slider2.pack()
 
-        self.stop_button = tk.Button(master, text="Stop", bg="yellow", command=self.run_stop)
-        self.stop_button.pack(side=tk.LEFT)
+        self.slider3 = tk.Scale(master, from_=12.5, to=7.5, resolution=0.1, label="Index Servo", command=self.run_servo3)
+        self.slider3.pack()
 
-        self.solenoid_button = tk.Button(master, text="Solenoid", bg="blue", command=self.toggle_solenoid)
-        self.solenoid_button.pack(side=tk.LEFT)
+        self.buttons = []
+        for i in range(8):
+            button = tk.Button(master, text="Solenoid {}".format(i+1), bg="white", command=lambda pin=solenoid_pins[i]: self.toggle_solenoid(pin))
+            button.pack()
+            self.buttons.append(button)
 
-        self.solenoid_state = False
+        # Set up ROS node and subscriber
+        rospy.init_node('solenoid_controller')
+        rospy.Subscriber('shutdown_solenoids', Bool, self.shutdown_solenoids)
 
-    def run_clockwise(self):
-        servo.ChangeDutyCycle(7.5)
+    def run_servo1(self, duty_cycle):
+        servo1.ChangeDutyCycle(float(duty_cycle))
 
-    def run_counterclockwise(self):
-        servo.ChangeDutyCycle(2.5)
+    def run_servo2(self, duty_cycle):
+        servo2.ChangeDutyCycle(float(duty_cycle))
 
-    def run_stop(self):
-        servo.ChangeDutyCycle(5)
+    def run_servo3(self, duty_cycle):
+        servo3.ChangeDutyCycle(float(duty_cycle))
 
-    def toggle_solenoid(self):
-        self.solenoid_state = not self.solenoid_state
-        GPIO.output(solenoid_pin, self.solenoid_state)
+    def toggle_solenoid(self, pin):
+        GPIO.output(pin, not GPIO.input(pin))
+
+    def shutdown_solenoids(self, data):
+        if data.data:
+            for pin in solenoid_pins:
+                GPIO.output(pin, GPIO.LOW)
 
 root = tk.Tk()
 app = App(root)
 root.mainloop()
 
-servo.stop()
+servo1.stop()
+servo2.stop()
+servo3.stop()
 GPIO.cleanup()
