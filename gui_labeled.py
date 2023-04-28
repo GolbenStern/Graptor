@@ -1,4 +1,4 @@
-import tkinter as tk
+import Tkinter as tk
 import RPi.GPIO as GPIO
 
 # Define GPIO pins for servos and solenoids
