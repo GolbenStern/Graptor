@@ -1,5 +1,5 @@
 import RPi.GPIO as GPIO
-import tkinter as tk
+import Tkinter as tk
 
 servo_pin1 = 2
 servo_pin2 = 3
